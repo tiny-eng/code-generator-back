@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, ConfigDict
 
 class UserCreate(BaseModel):
     nickname: str
@@ -16,8 +16,7 @@ class UserResponse(BaseModel):
     nickname: str
     email: str
     role: str
+    access_token: str
 
-    class Config:
-        orm_mode = True # Import to convert SQLAlchemy models to Pandantic automatically
+    model_config = ConfigDict(from_attributes=True)
 
-        

@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException
-from app.routers import user_router
+from app.routers import user_router, admin_rotuer
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from app.database import SessionLocal
@@ -17,6 +17,7 @@ app.add_middleware(
 )
 
 app.include_router(user_router.router)
+app.include_router(admin_rotuer.router)
 
 
 def check_database_connection():

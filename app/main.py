@@ -2,14 +2,11 @@ from fastapi import FastAPI, HTTPException
 from app.routers import user_router
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
-
 from app.database import SessionLocal
-
 from sqlalchemy.exc import SQLAlchemyError
-
+from fastapi.responses import Response
 
 app = FastAPI()
-
 
 app.add_middleware(
     CORSMiddleware,
@@ -40,3 +37,7 @@ async def health_check():
         return {"status": "OK", "message": "Database connection successful."}
     else:
         raise HTTPException(status_code=500, detail="Database connection failed.")
+    
+@app.get("/favicon.ico")
+async def favicon():
+    return Response(status_code=204)

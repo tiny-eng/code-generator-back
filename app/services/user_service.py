@@ -1,38 +1,32 @@
-from app.models.user_model import User
-from app.database import SessionLocal
-from app.utils.security import hash_password, verify_password
+from sqlalchemy.orm import Session
 from fastapi import HTTPException
 
-def create_user(user_data):
-    db = SessionLocal()
+from app.schemas.user_schema import UserCreate, UserLogin
+from app.models.user_model import User
+from app.crud.user_crud import get_by_email, get_by_id, create_user
+from app.utils.security import hash_password, verify_password
 
-    # Check if email already exists
-    existing_user = db.query(User).filter(User.email == user_data.email).first()
+def create_user_service(user_data: UserCreate, db: Session):
+    existing_user = get_by_email(db, user_data.email)
     if existing_user:
-        db.close()
         raise HTTPException(status_code=400, detail="Email already registered")
-
+    
     hashed_pw = hash_password(user_data.password)
 
-    db_user = User(
+    user = User(
         nickname=user_data.nickname,
         email=user_data.email,
         password=hashed_pw,
         role=user_data.role
     )
 
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    db.close()
-    return db_user
+    return create_user(db, user)
 
+def autheticate_user_service(login_data: UserLogin, db: Session):
+    email = login_data.email
+    password = login_data.password
 
-def authenticate_user(email: str, password: str):
-    db = SessionLocal()
-    user = db.query(User).filter(User.email == email).first()
-    db.close()
-
+    user = get_by_email(db, email)
     if not user:
         raise HTTPException(status_code=400, detail="Invalid email")
     
@@ -40,4 +34,3 @@ def authenticate_user(email: str, password: str):
         raise HTTPException(status_code=400, detail="Invalid password")
     
     return user
-

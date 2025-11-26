@@ -18,6 +18,6 @@ class UserResponse(BaseModel):
     role: str
 
     class Config:
-        orm_mode = True
+        orm_mode = True # Import to convert SQLAlchemy models to Pandantic automatically
 
         
